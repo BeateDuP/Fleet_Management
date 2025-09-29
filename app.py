@@ -1,30 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
-# Create ONE SQLAlchemy instance (do not pass app here)
-db = SQLAlchemy()
+from models import db, User, Vehicle, Booking  # import models and db
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'your_secret_key'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fleet.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'your_secret_key_here'  # Required for session & flash
 
-    # Initialize db with app
-    db.init_app(app)
-
-    # Import models here so they are registered with SQLAlchemy
-    with app.app_context():
-        db.create_all()
-
-        # Add default users
-        from models import User
-        if not User.query.filter_by(username='user123').first():
-            db.session.add(User(username='user123', password='pass123', is_admin=False))
-        if not User.query.filter_by(username='admin').first():
-            db.session.add(User(username='admin', password='adminpass', is_admin=True))
-        db.session.commit()
+    db.init_app(app)  # initialize SQLAlchemy with app
 
     # -------------------- LOGIN --------------------
     @app.route('/', methods=['GET', 'POST'])
@@ -36,9 +21,7 @@ def create_app():
             if user:
                 session['username'] = username
                 session['is_admin'] = user.is_admin
-                if user.is_admin:
-                    return redirect(url_for('admin_dashboard'))
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('admin_dashboard') if user.is_admin else url_for('dashboard'))
             else:
                 flash("Invalid username or password.")
                 return redirect(url_for('login'))
@@ -159,7 +142,7 @@ def create_app():
             elif action == 'returned':
                 booking.returned = True
             db.session.commit()
-            return redirect(url_for('approved'))
+            return redirect(url_for('approved_bookings'))
 
         return render_template('approved.html', bookings=bookings)
 
@@ -210,6 +193,10 @@ def create_app():
     
     return app
 
+
 # ======================== RUN APP ========================
 if __name__ == '__main__':
+    app = create_app()
+    with app.app_context():
+        db.create_all()  # Create tables if they don't exist
     app.run(debug=True)
