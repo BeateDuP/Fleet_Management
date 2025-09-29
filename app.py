@@ -2,27 +2,29 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-def create_app():
+# Create ONE SQLAlchemy instance (do not pass app here)
+db = SQLAlchemy()
 
+def create_app():
     app = Flask(__name__)
     app.secret_key = 'your_secret_key'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fleet.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    db = SQLAlchemy(app)
+    # Initialize db with app
     db.init_app(app)
 
-    # ======================== DATABASE INITIALIZATION ========================
+    # Import models here so they are registered with SQLAlchemy
     with app.app_context():
         db.create_all()
-        # Default users
+
+        # Add default users
+        from models import User
         if not User.query.filter_by(username='user123').first():
             db.session.add(User(username='user123', password='pass123', is_admin=False))
         if not User.query.filter_by(username='admin').first():
             db.session.add(User(username='admin', password='adminpass', is_admin=True))
         db.session.commit()
-
-    # ======================== ROUTES ========================
 
     # -------------------- LOGIN --------------------
     @app.route('/', methods=['GET', 'POST'])
