@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styling.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Manage Users</h1>
+
+        <!-- Add new user -->
+        <h2>Add New User</h2>
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit" name="action" value="add" class="btn">Add User</button>
+        </form>
+
+        <!-- List existing users -->
+        <h2>Existing Users</h2>
+        {% if users %}
+            <ul>
+                {% for u in users %}
+                <li>
+                    {{ u.username }}
+                    {% if not u.is_admin %}
+                        <form method="POST" style="display:inline-block;">
+                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                            <button type="submit" name="action" value="delete" class="btn">Delete</button>
+                        </form>
+                    {% else %}
+                        <span>(Admin)</span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No users found.</p>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn">Back to Admin Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

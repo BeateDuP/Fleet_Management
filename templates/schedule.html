@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Schedule Vehicle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styling.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Schedule a Vehicle</h1>
+        <form method="POST">
+            <label>Start Time:</label>
+            <input type="datetime-local" name="start_time" required>
+            <label>End Time:</label>
+            <input type="datetime-local" name="end_time" required>
+            <button type="submit" class="btn">See Available Vehicles</button>
+        </form>
+    </div>
+</body>
+</html>

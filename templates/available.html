@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Available Vehicles</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styling.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Available Vehicles</h1>
+        {% if vehicles %}
+            <form method="POST">
+                {% for vehicle in vehicles %}
+                    <input type="radio" name="vehicle" value="{{ vehicle.id }}" required> {{ vehicle.name }}<br>
+                {% endfor %}
+                <button type="submit" class="btn">Request Booking</button>
+            </form>
+        {% else %}
+            <p>No vehicles available for this period.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+

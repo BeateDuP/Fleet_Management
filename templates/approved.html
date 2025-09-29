@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Approved Bookings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styling.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Approved Bookings</h1>
+        {% if bookings %}
+            <table>
+                <tr>
+                    <th>User</th>
+                    <th>Vehicle</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Collected</th>
+                    <th>Returned</th>
+                </tr>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.username }}</td>
+                    <td>{{ booking.vehicle.name }}</td>
+                    <td>{{ booking.start_time }}</td>
+                    <td>{{ booking.end_time }}</td>
+                    <td>
+                        {% if not booking.collected %}
+                        <form method="POST" style="display:inline-block;">
+                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                            <button type="submit" name="action" value="collected" class="btn">Mark Collected</button>
+                        </form>
+                        {% else %}
+                            Yes
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if booking.collected and not booking.returned %}
+                        <form method="POST" style="display:inline-block;">
+                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                            <button type="submit" name="action" value="returned" class="btn">Mark Returned</button>
+                        </form>
+                        {% elif booking.returned %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No approved bookings pending collection or return.</p>
+        {% endif %}
+        <a href="{{ url_for('admin_dashboard') }}" class="btn">Back to Admin Dashboard</a>
+    </div>
+</body>
+</html>
